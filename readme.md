@@ -4,22 +4,24 @@ Aivilo Express is a Node.js boilerplate with Express.js, built for quickly setti
 
 ## Features
 
-- 🚀 **TypeScript** - Type safety dan better developer experience
+- 🚀 **TypeScript** - Type safety and better developer experience
 - 🔒 **Security** - Built-in security middlewares (helmet, rate limit, XSS protection)
-- 📝 **Validation** - Request validation menggunakan Zod
-- 🗄️ **Database** - Prisma ORM dengan type safety
-- 🔄 **CRUD Generator** - Base service dan controller yang reusable
-- 🚦 **Error Handling** - Centralized error handling dan custom errors
+- 📝 **Validation** - Request validation using Zod
+- 🗄️ **Database** - Prisma ORM with type safety
+- 🔄 **CRUD Generator** - Reusable base service and controller
+- 🚦 **Error Handling** - Centralized error handling and custom errors
 - 📊 **Pagination** - Built-in pagination support
-- 🔍 **Type-safe Environment** - Environment variables validation dengan Zod
+- 🔍 **Type-safe Environment** - Environment variables validation with Zod
+- 🔐 **Permission System** - Role-based access control with permission middleware
 
 ## Quick Start
+
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/aivilo-express.git
+git clone https://github.com/setioko27/aivilo-express.git
 
 # Install dependencies
-npm install
+yarn install
 
 # Setup environment variables
 cp .env.example .env
@@ -31,7 +33,7 @@ npx prisma generate
 npx prisma migrate dev
 
 # Start development server
-npm run dev
+yarn run dev
 ```
 
 ## Project Structure
@@ -45,7 +47,7 @@ src/
 ├── middleware/         # Express middlewares
 │   ├── auth.ts        # Authentication middleware
 │   ├── validate.ts    # Request validation middleware
-|   |-- permission.ts  # Permissions validation middleware
+│   ├── permission.ts  # Permission validation middleware
 │   └── error.ts       # Error handling middleware
 ├── modules/           # Feature modules
 │   ├── user/          # User module
@@ -53,7 +55,11 @@ src/
 │   │   ├── user.service.ts
 │   │   ├── user.route.ts
 │   │   └── user.schema.ts
-│   └── role/          # Role module
+│   └── role/          # Role & Permission module
+│       ├── role.controller.ts
+│       ├── role.service.ts
+│       ├── role.route.ts
+│       └── role.schema.ts
 ├── utils/             # Utility functions
 │   ├── crud/          # Base CRUD operations
 │   │   ├── controller.ts
@@ -158,8 +164,9 @@ JWT_SECRET=your-secret-key
     "dev": "nodemon",
     "build": "tsc && tsc-alias",
     "start": "node dist/server.js",
-    "lint": "eslint src/**/*.ts",
-    "format": "prettier --write src/**/*.ts"
+    "db:push": "npx prisma db push && npx prisma generate",
+    "db:pull": "npx prisma db pull && npx prisma generate",
+    "seed": "npx prisma db seed",
   }
 }
 ```
@@ -180,3 +187,33 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Permission System Example
+
+```typescript
+// Define permissions in route
+router.get('/', 
+    auth(), 
+    checkPermission('users.view'), 
+    userController.getAll
+);
+
+// Multiple permissions
+router.post('/',
+    auth(),
+    checkPermission(['users.create', 'users.manage']),
+    validate(userSchema.create),
+    userController.create
+);
+
+// Custom permission logic
+router.put('/:id',
+    auth(),
+    checkPermission('users.update', async (req) => {
+        // Check if user is updating their own profile
+        return req.user.id === parseInt(req.params.id);
+    }),
+    validate(userSchema.update),
+    userController.update
+);
+```

@@ -4,7 +4,7 @@ import { success } from '@/utils/response';
 import { CRUDController } from '@/utils/crud/controller';
 
 // Base CRUD operations
-const baseController = CRUDController(userService);
+const userController = CRUDController(userService);
 
 // Custom operations
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -42,7 +42,7 @@ export const getEditData = async (req: Request, res: Response,next: NextFunction
 };
 
 export default {
-    ...baseController,
+    ...userController,
     createUser,
     getFormData,
     getEditData
