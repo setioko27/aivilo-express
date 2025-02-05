@@ -1,0 +1,9 @@
+{
+  "watch": [
+    "src",
+    "server.ts"
+  ],
+  "ext": ".ts,.js,.json",
+  "ignore": ["node_modules", "coverage", "dist"],
+  "exec": "ts-node -r tsconfig-paths/register -r module-alias/register ./index.ts"
+} 
